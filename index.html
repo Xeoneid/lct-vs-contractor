@@ -20,9 +20,6 @@
   <!-- Datos Generales -->
   <div class="section">
     <h2>Parámetros Generales</h2>
-    <label for="dolarValue">Valor Dólar (ARS)</label>
-    <input type="number" id="dolarValue" value="200" oninput="calcular()" step="0.01" />
-    <br/>
     <label for="vacaciones">Sem. Vacaciones</label>
     <input type="number" id="vacaciones" value="2" oninput="calcular()" />
     <br/>
@@ -80,7 +77,6 @@
   <script>
     function calcular() {
       // Leer inputs
-      const dolarValue = parseFloat(document.getElementById('dolarValue').value) || 0;
       const vacaciones = parseFloat(document.getElementById('vacaciones').value) || 0;
       const enfermedad = parseFloat(document.getElementById('enfermedad').value) || 0;
       const estudio = parseFloat(document.getElementById('estudio').value) || 0;
@@ -114,7 +110,6 @@
       let contractorNetoAnual = contractorBrutoAnual - contractorGastosAnual;
 
       // Mostrar resultados
-      // Los mostramos en USD para simplificar, o podríamos hacer la conversión a ARS * dolarValue si queremos
       document.getElementById('empleadoAnual').innerText = `
         Ingreso Bruto Anual: USD ${empleadoBrutoAnual.toFixed(2)}
         (Aportes: USD ${descAportes.toFixed(2)})
