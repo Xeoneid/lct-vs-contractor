@@ -1,0 +1,145 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora: Empleado vs. Contractor</title>
+  <style>
+    /* Estilos mínimos para maquetar la onepager */
+    body { font-family: sans-serif; margin: 20px; }
+    .section { margin-bottom: 20px; }
+    .section h2 { margin-bottom: 10px; }
+    label { display: inline-block; width: 200px; }
+    input { width: 100px; }
+    .results { background: #f0f0f0; padding: 15px; }
+  </style>
+</head>
+<body>
+
+  <h1>Calculadora Comparativa</h1>
+  <p>Ingresa tus datos para comparar ingresos en 1 año como Empleado en Blanco vs Contractor.</p>
+
+  <!-- Datos Generales -->
+  <div class="section">
+    <h2>Parámetros Generales</h2>
+    <label for="dolarValue">Valor Dólar (ARS)</label>
+    <input type="number" id="dolarValue" value="200" oninput="calcular()" step="0.01" />
+    <br/>
+    <label for="vacaciones">Sem. Vacaciones</label>
+    <input type="number" id="vacaciones" value="2" oninput="calcular()" />
+    <br/>
+    <label for="enfermedad">Sem. Enfermedad</label>
+    <input type="number" id="enfermedad" value="1" oninput="calcular()" />
+    <br/>
+    <label for="estudio">Sem. Estudio</label>
+    <input type="number" id="estudio" value="1" oninput="calcular()" />
+  </div>
+
+  <!-- Empleado en Blanco -->
+  <div class="section">
+    <h2>Empleado en Blanco</h2>
+    <label for="empleadoSueldo">Sueldo Mensual (USD)</label>
+    <input type="number" id="empleadoSueldo" value="2000" oninput="calcular()" />
+    <br/>
+    <label for="empleadoAportes">% Aportes (aprox)</label>
+    <input type="number" id="empleadoAportes" value="17" oninput="calcular()" />
+    <p>(El aguinaldo se asume = 1 sueldo extra al año.)</p>
+  </div>
+
+  <!-- Contractor -->
+  <div class="section">
+    <h2>Contractor</h2>
+    <label for="contractorTarifa">Tarifa Mensual (USD)</label>
+    <input type="number" id="contractorTarifa" value="3000" oninput="calcular()" />
+    <br/>
+    <label for="contractorMonotributo">Monotributo (USD/mes)</label>
+    <input type="number" id="contractorMonotributo" value="80" oninput="calcular()" />
+    <br/>
+    <label for="contractorObraSocial">Obra Social (USD/mes)</label>
+    <input type="number" id="contractorObraSocial" value="100" oninput="calcular()" />
+    <br/>
+    <label for="contractorSeguro">Seguro (USD/mes)</label>
+    <input type="number" id="contractorSeguro" value="20" oninput="calcular()" />
+  </div>
+
+  <!-- Resultados -->
+  <div class="section results" id="resultados">
+    <h2>Resultados</h2>
+    <div>
+      <strong>Empleado en Blanco:</strong>
+      <p id="empleadoAnual"></p>
+    </div>
+    <div>
+      <strong>Contractor:</strong>
+      <p id="contractorAnual"></p>
+    </div>
+    <div>
+      <strong>Comparación:</strong>
+      <p id="comparacion"></p>
+    </div>
+  </div>
+
+  <script>
+    function calcular() {
+      // Leer inputs
+      const dolarValue = parseFloat(document.getElementById('dolarValue').value) || 0;
+      const vacaciones = parseFloat(document.getElementById('vacaciones').value) || 0;
+      const enfermedad = parseFloat(document.getElementById('enfermedad').value) || 0;
+      const estudio = parseFloat(document.getElementById('estudio').value) || 0;
+
+      const empleadoSueldo = parseFloat(document.getElementById('empleadoSueldo').value) || 0;
+      const empleadoAportes = parseFloat(document.getElementById('empleadoAportes').value) || 0;
+
+      const contractorTarifa = parseFloat(document.getElementById('contractorTarifa').value) || 0;
+      const contractorMonotributo = parseFloat(document.getElementById('contractorMonotributo').value) || 0;
+      const contractorObraSocial = parseFloat(document.getElementById('contractorObraSocial').value) || 0;
+      const contractorSeguro = parseFloat(document.getElementById('contractorSeguro').value) || 0;
+
+      // Empleado en Blanco
+      // 12 sueldos + 1 extra de aguinaldo = 13 sueldos brutos
+      let empleadoBrutoAnual = empleadoSueldo * 13;
+      // Aportes
+      let descAportes = (empleadoBrutoAnual * (empleadoAportes/100));
+      let empleadoNetoAnual = empleadoBrutoAnual - descAportes;
+
+      // Contractor
+      // Semanas totales al año = 52, se asume que las semanas no trabajadas no se facturan
+      let semanasNoTrabajadas = vacaciones + enfermedad + estudio;
+      let semanasTrabajadas = 52 - semanasNoTrabajadas;
+      // Meses equivalentes trabajados ~ (semanasTrabajadas / 4) => 48 sem = 12, 44 sem = 11...
+      // O asumes directamente 4 semanas = 1 mes => (52-4)/4 = 12, (52-4)/4 = 12. Lo haré más exacto:
+      let mesesTrabajados = semanasTrabajadas / 4;
+
+      let contractorBrutoAnual = contractorTarifa * mesesTrabajados;
+      // Gastos anuales (monotributo, etc.)
+      let contractorGastosAnual = (contractorMonotributo + contractorObraSocial + contractorSeguro) * 12;
+      let contractorNetoAnual = contractorBrutoAnual - contractorGastosAnual;
+
+      // Mostrar resultados
+      // Los mostramos en USD para simplificar, o podríamos hacer la conversión a ARS * dolarValue si queremos
+      document.getElementById('empleadoAnual').innerText = `
+        Ingreso Bruto Anual: USD ${empleadoBrutoAnual.toFixed(2)}
+        (Aportes: USD ${descAportes.toFixed(2)})
+        => Neto: USD ${empleadoNetoAnual.toFixed(2)}
+      `;
+
+      document.getElementById('contractorAnual').innerText = `
+        Semanas trabajadas: ${semanasTrabajadas}
+        => Bruto Anual: USD ${contractorBrutoAnual.toFixed(2)}
+        (Gastos: USD ${contractorGastosAnual.toFixed(2)})
+        => Neto: USD ${contractorNetoAnual.toFixed(2)}
+      `;
+
+      let diff = (contractorNetoAnual - empleadoNetoAnual).toFixed(2);
+      let diffPerc = ( (diff / empleadoNetoAnual) * 100 ).toFixed(2);
+
+      let comparacionStr = (diff >= 0)
+        ? `Como contractor ganas ${diff} USD más al año (+${diffPerc}%).`
+        : `Como contractor ganas ${Math.abs(diff)} USD menos al año (${diffPerc}%).`;
+
+      document.getElementById('comparacion').innerText = comparacionStr;
+    }
+
+    // Llamamos a la función inicial para mostrar datos al cargar
+    window.onload = calcular;
+  </script>
+</body>
+</html>
